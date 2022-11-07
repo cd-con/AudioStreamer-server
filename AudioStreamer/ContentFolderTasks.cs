@@ -2,41 +2,59 @@
 {
     internal class ContentFolderTasks
     {
-        private static AudioPipeline pipeline = new AudioPipeline();
+        private static AudioPipeline pipeline = new();
 
         private bool creationDaemonStarted = false;
-        private static List<string> tasks = new List<string>();
+        private static Queue<string> genTasks = new();
+        FileSystemWatcher watchdog;
+
         public void ContentFolderWatchdog(string pathToContentFolder)
         {
-            FileSystemWatcher watchdog = new FileSystemWatcher(pathToContentFolder);
-
+            watchdog = new(pathToContentFolder);
             watchdog.Created += OnFileCreated;
             watchdog.Deleted += OnFileDeleted;
+            watchdog.Error += new ErrorEventHandler(OnError);
 
             watchdog.EnableRaisingEvents = true;
             watchdog.IncludeSubdirectories = true;
         }
 
+        private void OnError(object source, ErrorEventArgs e)
+        {
+            if (e.GetException().GetType() == typeof(InternalBufferOverflowException))
+            {
+                Console.WriteLine("Error: File System Watcher internal buffer overflow at " + DateTime.Now + "\r\n");
+            }
+            else
+            {
+                Console.WriteLine("Error: Watched directory not accessible at " + DateTime.Now + "\r\n");
+            }
+            Console.WriteLine(e.GetException().Message);
+        }
+
         private void OnFileCreated(object sender, FileSystemEventArgs e)
         {
+            Console.WriteLine($"[ContentProcessingThread] creationDaemonStarted = {creationDaemonStarted}");
             if (new DirectoryInfo(e.FullPath).Extension != "")
             {
                 Console.WriteLine("A new one file was found in content folder!");
                 if (!creationDaemonStarted)
                 {
-                    Thread pThread = new(ContentProcessingTread);
+                    Console.WriteLine("[ContentProcessingThread] Starting creation daemon...");
+                    Thread pThread = new(ContentProcessingThread);
                     pThread.Start();
                     creationDaemonStarted = true;
                 }
-                tasks.Add(e.FullPath);
+                genTasks.Enqueue(e.FullPath);
             }
         }
 
-        private void ContentProcessingTread()
+        private void ContentProcessingThread()
         {
-            foreach (string fullPath in tasks)
+            while (genTasks.Count > 0)
             {
-                Console.WriteLine($"[ContentProcessingThread] Processing {tasks.IndexOf(fullPath) + 1} out of {tasks.Count}");
+                Console.WriteLine($"[ContentProcessingThread] Queue length = {genTasks.Count}");
+                string fullPath = genTasks.Dequeue();
                 string compressedFolderPath = Runtime.appPath + "/cache/" + new FileInfo(fullPath).Name;
 
                 // Делаем шакалы
@@ -59,13 +77,12 @@
                 // Записываем в БД
                 Runtime.dataInterface.AddSong(metadata.Tag.Title, metadata.Tag.Performers, compressedFolderPath + "/worst/", compressedFolderPath + "/mid/", compressedFolderPath + "/hq/");
 
-                // Освобождаем память
-                Console.WriteLine("[ContentProcessingThread] Cleaning up...");
-
-                
+                // Чистим вилочкой
+                Console.WriteLine("[ContentProcessingThread] Cleaning up...");                
 
                 DirectoryInfo di = new DirectoryInfo(Runtime.appPath + "/cache/audio/");
                 FileInfo[] files = di.GetFiles();
+
                 foreach (FileInfo file in files)
                 {
                     if (file.Extension == ".wav")
@@ -75,10 +92,11 @@
                 }
                 Console.WriteLine("[ContentProcessingThread] Temporary files were deleted successfully");
             }
+
             Console.WriteLine("[ContentProcessingThread] Ended.");
-            tasks.Clear();
-            GC.Collect();            
             creationDaemonStarted = false;
+            
+            GC.Collect();
         }
 
         private static void OnFileDeleted(object sender, FileSystemEventArgs e)

@@ -50,8 +50,22 @@ namespace AudioStreamer
             fs.Close();
         }
 
+        public void InitDatabase(string pathToBase)
+        {
+            pathToDatabase = pathToBase;
+            using FileStream fs = new(pathToBase, FileMode.OpenOrCreate);
+            ds = JsonSerializer.Deserialize<DataStruct>(fs);
+            fs.Close();
+        }
+
         public void AddSong(string songName, string[] songAuthors, string pathToHQ, string pathToMidQ, string pathToWorstQ)
         {
+            if(ds == null || ds.songStructs == null)
+            {
+                Console.WriteLine($"[DataInterfaceDebug] ds={ds};\nds.songStructs={ds.songStructs}\n---= If you see this, seems like an error occured and app will crash soon=---");
+                Console.WriteLine("[DataInterface] Database after initialization can't be read (null!). Retrying...");
+                OpenDatabase(pathToDatabase);
+            }
             if (ds.songStructs.Count == 0)
             {
                 ds.songStructs.Add(new SongStruct(0, songName, songAuthors, pathToWorstQ, pathToMidQ, pathToHQ));
@@ -60,9 +74,17 @@ namespace AudioStreamer
             {
                 ds.songStructs.Add(new SongStruct(ds.songStructs.Last().id + 1, songName, songAuthors, pathToWorstQ, pathToMidQ, pathToHQ));
             }
-            using FileStream fs = new(pathToDatabase, FileMode.OpenOrCreate);
-            JsonSerializer.Serialize(fs, ds);
-            fs.Close();
+            try
+            {
+                using FileStream fs = new(pathToDatabase, FileMode.OpenOrCreate);
+                JsonSerializer.Serialize(fs, ds);
+                fs.Close();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"[DataInterface] An error occured while saving database. Cause: {e.Message}");
+            }
+            
         }
     }
 }

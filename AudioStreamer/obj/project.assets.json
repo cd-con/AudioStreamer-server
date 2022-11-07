@@ -71,11 +71,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\lolfo\\source\\repos\\AudioStreamer\\AudioStreamer\\AudioStreamer.csproj",
+      "projectUniqueName": "C:\\Users\\lolfo\\Source\\Repos\\AudioStreamer-server\\AudioStreamer\\AudioStreamer.csproj",
       "projectName": "AudioStreamer",
-      "projectPath": "C:\\Users\\lolfo\\source\\repos\\AudioStreamer\\AudioStreamer\\AudioStreamer.csproj",
+      "projectPath": "C:\\Users\\lolfo\\Source\\Repos\\AudioStreamer-server\\AudioStreamer\\AudioStreamer.csproj",
       "packagesPath": "C:\\Users\\lolfo\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\lolfo\\source\\repos\\AudioStreamer\\AudioStreamer\\obj\\",
+      "outputPath": "C:\\Users\\lolfo\\Source\\Repos\\AudioStreamer-server\\AudioStreamer\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "E:\\Apps\\VS 2022\\Shared\\NuGetPackages"

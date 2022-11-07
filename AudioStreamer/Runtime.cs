@@ -14,8 +14,8 @@ namespace AudioStreamer
     internal class Runtime
     {
         public static String appPath = "/";
-        private static ContentFolderTasks CFT = new ContentFolderTasks();
-        public static DataInterface dataInterface = new DataInterface();
+        private static ContentFolderTasks CFT = new();
+        public static DataInterface dataInterface = new();
         public static void Main()
         {
             appPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);

@@ -54,7 +54,7 @@ namespace AudioStreamer
                     byte[] msg = new byte[1024];
                     int size = cSocket.Receive(msg);
                     string message = Encoding.UTF8.GetString(msg, 0, size);
-                    Security.Decrypt(msg, );
+                    //Security.Decrypt(msg, );
                 }
                 catch (SocketException sException)
                 {
