@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Reflection;
 
 // Сторонние библиотеки
 // NAudio - работа со звуком, конвертация
@@ -13,19 +8,22 @@ namespace AudioStreamer
 {
     internal class Runtime
     {
-        public static String appPath = "/";
+        public static string? appPath = "/";
         private static ContentFolderTasks CFT = new();
         public static DataInterface dataInterface = new();
         public static void Main()
         {
             appPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+            if (appPath == null)
+            {
+                throw new DirectoryNotFoundException("App runtime directory cannot be found.");
+            }
+
             if (IsFirstStartup()) 
             {
-                Console.WriteLine("Detected first startup. Creating folders... [1/2]");
+                Console.WriteLine("Detected first startup. Creating folders... [1/1]");
                 InitFolders();
-
-                Console.WriteLine("Creating database file... [2/2]");
-                InitDatabase();
 
                 Console.WriteLine("Done!");
             }
@@ -39,6 +37,7 @@ namespace AudioStreamer
 
 
             Console.WriteLine("Starting Web Server...");
+            WebServer.Run();
             Console.WriteLine("Ready!");
 
 
@@ -61,12 +60,6 @@ namespace AudioStreamer
 
             // Звука...
             Directory.CreateDirectory(appPath + "/cache/audio/");
-        }
-
-        static void InitDatabase()
-        {
-            // В БД хранится путь до файлов кэша, отправляемые сервером клиентом
-            //File.Create(appPath + "/cache/data.json");
         }
     }
 }

@@ -2,11 +2,11 @@
 {
     internal class ContentFolderTasks
     {
-        private static AudioPipeline pipeline = new();
+        private static readonly AudioPipeline pipeline = new();
 
         private bool creationDaemonStarted = false;
         private static Queue<string> genTasks = new();
-        FileSystemWatcher watchdog;
+        FileSystemWatcher? watchdog;
 
         public void ContentFolderWatchdog(string pathToContentFolder)
         {
@@ -17,6 +17,9 @@
 
             watchdog.EnableRaisingEvents = true;
             watchdog.IncludeSubdirectories = true;
+
+            // Скажем пользователю что мы готовы
+            Console.WriteLine("Content folder watchdog ready!");
         }
 
         private void OnError(object source, ErrorEventArgs e)
@@ -29,7 +32,6 @@
             {
                 Console.WriteLine("Error: Watched directory not accessible at " + DateTime.Now + "\r\n");
             }
-            Console.WriteLine(e.GetException().Message);
         }
 
         private void OnFileCreated(object sender, FileSystemEventArgs e)
@@ -80,7 +82,7 @@
                 // Чистим вилочкой
                 Console.WriteLine("[ContentProcessingThread] Cleaning up...");                
 
-                DirectoryInfo di = new DirectoryInfo(Runtime.appPath + "/cache/audio/");
+                DirectoryInfo di = new (Runtime.appPath + "/cache/audio/");
                 FileInfo[] files = di.GetFiles();
 
                 foreach (FileInfo file in files)

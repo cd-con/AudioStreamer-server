@@ -5,34 +5,34 @@ namespace AudioStreamer
 {
     class SongStruct
     {
-        public int id { get; }
-        public string songName { get; }
-        public string[] songAuthors { get; }
+        public int SongID { get; }
+        public string SongName { get; }
+        public string[] SongAuthors { get; }
 
-        public string pathToWorstQ { get; set; }
+        public string PathToWorstQualityDirectory { get; set; }
 
-        public string pathToMidQ { get; set; }
+        public string PathToMediumQualityDirectory { get; set; }
 
-        public string pathToHQ { get; set; }
+        public string PathToHighQualityDirectory { get; set; }
 
         public SongStruct(int id, string songName, string[] songAuthors, string pathToWorstQ, string pathToMidQ, string pathToHQ)
         {
-            this.id = id;
-            this.songName = songName;
-            this.songAuthors = songAuthors;
-            this.pathToWorstQ = pathToWorstQ;
-            this.pathToMidQ = pathToMidQ;
-            this.pathToHQ = pathToHQ;
+            this.SongID = id;
+            this.SongName = songName;
+            this.SongAuthors = songAuthors;
+            this.PathToWorstQualityDirectory = pathToWorstQ;
+            this.PathToMediumQualityDirectory = pathToMidQ;
+            this.PathToHighQualityDirectory = pathToHQ;
         }
     }
 
     class DataStruct
     {
-        public List<SongStruct>? songStructs { get; set; }
+        public List<SongStruct>? SongStructs { get; set; }
 
         public DataStruct(List<SongStruct>? songStructs)
         {
-            this.songStructs = songStructs;
+            this.SongStructs = songStructs;
         }
     }
 
@@ -48,6 +48,9 @@ namespace AudioStreamer
             using FileStream fs = new(pathToBase, FileMode.OpenOrCreate);
             ds = JsonSerializer.Deserialize<DataStruct>(fs);
             fs.Close();
+
+            // Дадим пользователю знать что БД готова к работе
+            Console.WriteLine("Database ready!");
         }
 
         public void InitDatabase(string pathToBase)
@@ -60,19 +63,18 @@ namespace AudioStreamer
 
         public void AddSong(string songName, string[] songAuthors, string pathToHQ, string pathToMidQ, string pathToWorstQ)
         {
-            if(ds == null || ds.songStructs == null)
+            if(ds == null || ds.SongStructs == null)
             {
-                Console.WriteLine($"[DataInterfaceDebug] ds={ds};\nds.songStructs={ds.songStructs}\n---= If you see this, seems like an error occured and app will crash soon=---");
                 Console.WriteLine("[DataInterface] Database after initialization can't be read (null!). Retrying...");
                 OpenDatabase(pathToDatabase);
             }
-            if (ds.songStructs.Count == 0)
+            if (ds.SongStructs.Count == 0)
             {
-                ds.songStructs.Add(new SongStruct(0, songName, songAuthors, pathToWorstQ, pathToMidQ, pathToHQ));
+                ds.SongStructs.Add(new SongStruct(0, songName, songAuthors, pathToWorstQ, pathToMidQ, pathToHQ));
             }
             else
             {
-                ds.songStructs.Add(new SongStruct(ds.songStructs.Last().id + 1, songName, songAuthors, pathToWorstQ, pathToMidQ, pathToHQ));
+                ds.SongStructs.Add(new SongStruct(ds.SongStructs.Last().SongID + 1, songName, songAuthors, pathToWorstQ, pathToMidQ, pathToHQ));
             }
             try
             {
