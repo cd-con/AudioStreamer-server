@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
+﻿using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace AudioStreamer
 {
@@ -19,6 +15,7 @@ namespace AudioStreamer
         {
             Thread sThread = new(ServerThread);
 
+            // TODO Добавить шифрование
             networkKey = Encoding.ASCII.GetBytes("Chaplya4422");
             sThread.Start();
         }
@@ -53,8 +50,32 @@ namespace AudioStreamer
                 {
                     byte[] msg = new byte[1024];
                     int size = cSocket.Receive(msg);
-                    string message = Encoding.UTF8.GetString(msg, 0, size);
+                    List<string> userRequest = Encoding.UTF8.GetString(msg, 0, size).Split(" ").ToList();
                     //Security.Decrypt(msg, );
+
+                    // Работаем над нашим запросом
+                    if (userRequest.Count == 0)
+                    {
+                        Console.WriteLine("[Web] Request error - no command present in request!");
+                    }
+                    else
+                    {
+                        // Оставляем только аргументы
+                        List<string> args = (List<string>)userRequest.Select(item => userRequest[0] != item ? item : null);
+                        args.RemoveAll(item => item == null);
+
+                        if (userRequest.First() == "ping")
+                        {
+                            // Implement
+                        }
+                        if (userRequest.First() == "get_song_by_id")
+                        {
+                            // Implement
+                        }
+
+                    }
+                    
+
                 }
                 catch (SocketException sException)
                 {

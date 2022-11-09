@@ -1,11 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "joRNmm/P447DDnKjg1OFbJpFP2ZT8tOUHrOUUFz1wzk7fU0F7bolcFw+jWD8LaDredxdDk+8YCpTon1JblX7gA==",
+  "dgSpecHash": "nYEOQ2Uo69huilv41Sb6c9t/rLlJYrEGB5mrAO6FOAO/M3Saozz1HEd7lW5F6Px7ZxPti5bGTNHd5HL1lv7LmQ==",
   "success": true,
-  "projectFilePath": "C:\\Users\\lolfo\\Source\\Repos\\AudioStreamer-server\\AudioStreamer\\AudioStreamer.csproj",
+  "projectFilePath": "C:\\Users\\ИСП-21\\Source\\Repos\\cd-con\\AudioStreamer-server\\AudioStreamer\\AudioStreamer.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\lolfo\\.nuget\\packages\\naudio.core\\2.1.0\\naudio.core.2.1.0.nupkg.sha512",
-    "C:\\Users\\lolfo\\.nuget\\packages\\taglibsharp\\2.3.0\\taglibsharp.2.3.0.nupkg.sha512"
+    "C:\\Users\\ИСП-21\\.nuget\\packages\\naudio.core\\2.1.0\\naudio.core.2.1.0.nupkg.sha512",
+    "C:\\Users\\ИСП-21\\.nuget\\packages\\taglibsharp\\2.3.0\\taglibsharp.2.3.0.nupkg.sha512"
   ],
   "logs": []
 }

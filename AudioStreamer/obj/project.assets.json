@@ -65,23 +65,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\lolfo\\.nuget\\packages\\": {},
-    "E:\\Apps\\VS 2022\\Shared\\NuGetPackages": {}
+    "C:\\Users\\ИСП-21\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\lolfo\\Source\\Repos\\AudioStreamer-server\\AudioStreamer\\AudioStreamer.csproj",
+      "projectUniqueName": "C:\\Users\\ИСП-21\\Source\\Repos\\cd-con\\AudioStreamer-server\\AudioStreamer\\AudioStreamer.csproj",
       "projectName": "AudioStreamer",
-      "projectPath": "C:\\Users\\lolfo\\Source\\Repos\\AudioStreamer-server\\AudioStreamer\\AudioStreamer.csproj",
-      "packagesPath": "C:\\Users\\lolfo\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\lolfo\\Source\\Repos\\AudioStreamer-server\\AudioStreamer\\obj\\",
+      "projectPath": "C:\\Users\\ИСП-21\\Source\\Repos\\cd-con\\AudioStreamer-server\\AudioStreamer\\AudioStreamer.csproj",
+      "packagesPath": "C:\\Users\\ИСП-21\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\ИСП-21\\Source\\Repos\\cd-con\\AudioStreamer-server\\AudioStreamer\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
-        "E:\\Apps\\VS 2022\\Shared\\NuGetPackages"
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\lolfo\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\ИСП-21\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -90,8 +90,8 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "https://api.nuget.org/v3/index.json": {},
-        "https://packages.stride3d.net/nuget": {}
+        "C:\\Program Files\\dotnet\\library-packs": {},
+        "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "net6.0": {
@@ -134,7 +134,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.401\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.400\\RuntimeIdentifierGraph.json"
       }
     }
   }
