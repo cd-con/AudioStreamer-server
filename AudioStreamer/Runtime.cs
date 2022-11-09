@@ -61,5 +61,9 @@ namespace AudioStreamer
             // Звука...
             Directory.CreateDirectory(appPath + "/cache/audio/");
         }
+        public static void ExitApp()
+        {
+            Environment.Exit(-1);
+        }
     }
 }

@@ -16,7 +16,8 @@ namespace AudioStreamer
             Thread sThread = new(ServerThread);
 
             // TODO Добавить шифрование
-            networkKey = Encoding.ASCII.GetBytes("Chaplya4422");
+            // networkKey = Encoding.ASCII.GetBytes("Chaplya4422");
+            Console.WriteLine("[Web] WebServer started!");
             sThread.Start();
         }
 
@@ -66,11 +67,33 @@ namespace AudioStreamer
 
                         if (userRequest.First() == "ping")
                         {
-                            // Implement
+                            SendMessage(cSocket, "pong");
                         }
                         if (userRequest.First() == "get_song_by_id")
                         {
-                            // Implement
+                            SongStruct? sStruct = DataInterface.FindSongByID(int.Parse(args[0]));
+                            if (sStruct == null)
+                            {
+                                Console.WriteLine($"[Web] Request error - Song with ID {args[0]} does not exists");
+                            }
+                            else
+                            {
+                                if (args.Count > 1)
+                                {
+                                    switch (args[1])
+                                    {
+                                        case "lq":
+                                            SendSongToClient(cSocket, sStruct.PathToWorstQualityDirectory);
+                                            break;
+                                        case "hq":
+                                            SendSongToClient(cSocket, sStruct.PathToHighQualityDirectory);
+                                            break;
+                                        default:
+                                            SendSongToClient(cSocket, sStruct.PathToMediumQualityDirectory);
+                                            break;
+                                    }
+                                }
+                            }
                         }
 
                     }
@@ -84,6 +107,46 @@ namespace AudioStreamer
                 }
                 
             }
+        }
+        private static void SendMessage(Socket handler, string message)
+        {
+            StringBuilder builder = new StringBuilder();
+            int bytes = 0;
+            byte[] data = Encoding.Unicode.GetBytes(message);
+            handler.Send(data);
+        }
+
+        private static void SendRaw(Socket handler, byte[] rawData)
+        {
+            handler.Send(rawData);
+        }
+
+        private static void SendSongToClient(Socket cSocket, string pathToFolder)
+        {
+            foreach (string pathToFile in Directory.GetFiles(pathToFolder))
+            {
+                using (FileStream fsSource = new FileStream(pathToFile, FileMode.Open, FileAccess.Read))
+                {
+                    byte[] bytes = new byte[fsSource.Length];
+                    int numBytesToRead = (int)fsSource.Length;
+                    int numBytesRead = 0;
+
+                    while (numBytesToRead > 0)
+                    {
+                        int n = fsSource.Read(bytes, numBytesRead, numBytesToRead);
+
+                        // Останавливаемся, когда дочитаем до конца
+                        if (n == 0)
+                            break;
+
+                        numBytesRead += n;
+                        numBytesToRead -= n;
+                    }
+                    numBytesToRead = bytes.Length;
+                    SendRaw(cSocket, bytes);
+                }
+            }
+            GC.Collect();
         }
     }
 }

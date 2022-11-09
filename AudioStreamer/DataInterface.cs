@@ -40,17 +40,25 @@ namespace AudioStreamer
     internal class DataInterface
     {
 
-        private DataStruct? ds;
+        private static DataStruct? ds;
         private string pathToDatabase = "";
         public void OpenDatabase(string pathToBase)
         {
-            pathToDatabase = pathToBase;
-            using FileStream fs = new(pathToBase, FileMode.OpenOrCreate);
-            ds = JsonSerializer.Deserialize<DataStruct>(fs);
-            fs.Close();
+            try
+            {
+                pathToDatabase = pathToBase;
+                using FileStream fs = new(pathToBase, FileMode.OpenOrCreate);
+                ds = JsonSerializer.Deserialize<DataStruct>(fs);
+                fs.Close();
 
-            // Дадим пользователю знать что БД готова к работе
-            Console.WriteLine("Database ready!");
+                // Дадим пользователю знать что БД готова к работе
+                Console.WriteLine("Database ready!");
+            }
+            catch (JsonException)
+            {
+                Console.WriteLine("[DataInterface] Database not found or corrupted.");
+                Runtime.ExitApp();
+            }
         }
 
         public void InitDatabase(string pathToBase)
@@ -63,7 +71,7 @@ namespace AudioStreamer
 
         public void AddSong(string songName, string[] songAuthors, string pathToHQ, string pathToMidQ, string pathToWorstQ)
         {
-            if(ds == null || ds.SongStructs == null)
+            if (ds == null || ds.SongStructs == null)
             {
                 Console.WriteLine("[DataInterface] Database after initialization can't be read (null!). Retrying...");
                 OpenDatabase(pathToDatabase);
@@ -86,7 +94,24 @@ namespace AudioStreamer
             {
                 Console.WriteLine($"[DataInterface] An error occured while saving database. Cause: {e.Message}");
             }
-            
+
+        }
+        /*
+         * Ищет песню по ID
+         * 
+         * Возвращает SongStruct если найдено
+         * Возвращает null если не найдено
+         */
+        public static SongStruct? FindSongByID(int TargetSongID)
+        {
+            foreach (SongStruct ss in ds.SongStructs)
+            {
+                if (ss.SongID == TargetSongID)
+                {
+                    return ss;
+                }
+            }
+            return null;
         }
     }
 }
