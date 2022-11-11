@@ -15,14 +15,14 @@ namespace AudioStreamer
 
         public string PathToHighQualityDirectory { get; set; }
 
-        public SongStruct(int id, string songName, string[] songAuthors, string pathToWorstQ, string pathToMidQ, string pathToHQ)
+        public SongStruct(int SongID, string SongName, string[] SongAuthors, string PathToWorstQualityDirectory, string PathToMediumQualityDirectory, string PathToHighQualityDirectory)
         {
-            this.SongID = id;
-            this.SongName = songName;
-            this.SongAuthors = songAuthors;
-            this.PathToWorstQualityDirectory = pathToWorstQ;
-            this.PathToMediumQualityDirectory = pathToMidQ;
-            this.PathToHighQualityDirectory = pathToHQ;
+            this.SongID = SongID;
+            this.SongName = SongName;
+            this.SongAuthors = SongAuthors;
+            this.PathToWorstQualityDirectory = PathToWorstQualityDirectory;
+            this.PathToMediumQualityDirectory = PathToMediumQualityDirectory;
+            this.PathToHighQualityDirectory = PathToHighQualityDirectory;
         }
     }
 

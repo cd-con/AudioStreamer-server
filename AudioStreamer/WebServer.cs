@@ -51,7 +51,7 @@ namespace AudioStreamer
                 {
                     byte[] msg = new byte[1024];
                     int size = cSocket.Receive(msg);
-                    List<string> userRequest = Encoding.UTF8.GetString(msg, 0, size).Split(" ").ToList();
+                    List<string> userRequest = Encoding.Unicode.GetString(msg, 0, size).Split(" ").ToList();
                     //Security.Decrypt(msg, );
 
                     // Работаем над нашим запросом
@@ -61,26 +61,26 @@ namespace AudioStreamer
                     }
                     else
                     {
-                        // Оставляем только аргументы
-                        List<string> args = (List<string>)userRequest.Select(item => userRequest[0] != item ? item : null);
-                        args.RemoveAll(item => item == null);
-
                         if (userRequest.First() == "ping")
                         {
+                            Console.WriteLine("[Web] Pong");
                             SendMessage(cSocket, "pong");
                         }
                         if (userRequest.First() == "get_song_by_id")
                         {
-                            SongStruct? sStruct = DataInterface.FindSongByID(int.Parse(args[0]));
+                            userRequest.RemoveAt(0);
+                            SongStruct? sStruct = DataInterface.FindSongByID(int.Parse(userRequest[0]));
                             if (sStruct == null)
                             {
-                                Console.WriteLine($"[Web] Request error - Song with ID {args[0]} does not exists");
+                                Console.WriteLine($"[Web] Request error - Song with ID {userRequest[0]} does not exists");
+                                SendMessage(cSocket, "transmission_end");
                             }
                             else
                             {
-                                if (args.Count > 1)
+                                Console.WriteLine("[Web] Processing song...");
+                                try
                                 {
-                                    switch (args[1])
+                                    switch (userRequest[1])
                                     {
                                         case "lq":
                                             SendSongToClient(cSocket, sStruct.PathToWorstQualityDirectory);
@@ -93,11 +93,17 @@ namespace AudioStreamer
                                             break;
                                     }
                                 }
+                                catch (ArgumentOutOfRangeException)
+                                {
+                                    SendSongToClient(cSocket, sStruct.PathToMediumQualityDirectory);
+                                }
+                               
+                                Console.WriteLine("[Web] Done");
                             }
                         }
 
                     }
-                    
+
 
                 }
                 catch (SocketException sException)
@@ -105,13 +111,12 @@ namespace AudioStreamer
                     Console.WriteLine($"[Web] Client disconnected. Cause: {sException.Message}");
                     break;
                 }
-                
+
             }
         }
         private static void SendMessage(Socket handler, string message)
         {
             StringBuilder builder = new StringBuilder();
-            int bytes = 0;
             byte[] data = Encoding.Unicode.GetBytes(message);
             handler.Send(data);
         }
@@ -123,6 +128,7 @@ namespace AudioStreamer
 
         private static void SendSongToClient(Socket cSocket, string pathToFolder)
         {
+            Console.WriteLine($"[Web] Processing {Directory.GetFiles(pathToFolder).Length} files in folder");
             foreach (string pathToFile in Directory.GetFiles(pathToFolder))
             {
                 using (FileStream fsSource = new FileStream(pathToFile, FileMode.Open, FileAccess.Read))
@@ -134,11 +140,6 @@ namespace AudioStreamer
                     while (numBytesToRead > 0)
                     {
                         int n = fsSource.Read(bytes, numBytesRead, numBytesToRead);
-
-                        // Останавливаемся, когда дочитаем до конца
-                        if (n == 0)
-                            break;
-
                         numBytesRead += n;
                         numBytesToRead -= n;
                     }
@@ -146,6 +147,8 @@ namespace AudioStreamer
                     SendRaw(cSocket, bytes);
                 }
             }
+            SendRaw(cSocket, Array.Empty<byte>());
+            SendMessage(cSocket, "transmission_end");
             GC.Collect();
         }
     }

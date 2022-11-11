@@ -77,7 +77,7 @@
                 // Читаем метадату
                 TagLib.File metadata = TagLib.File.Create(fullPath.ToString());
                 // Записываем в БД
-                Runtime.dataInterface.AddSong(metadata.Tag.Title, metadata.Tag.Performers, compressedFolderPath + "/worst/", compressedFolderPath + "/mid/", compressedFolderPath + "/hq/");
+                Runtime.dataInterface.AddSong(metadata.Tag.Title, metadata.Tag.Performers, compressedFolderPath + "/hq/", compressedFolderPath + "/mid/", compressedFolderPath + "/worst/");
 
                 // Чистим вилочкой
                 Console.WriteLine("[ContentProcessingThread] Cleaning up...");                
