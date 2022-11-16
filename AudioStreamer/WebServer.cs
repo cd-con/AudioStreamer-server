@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Sockets;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
 namespace AudioStreamer
@@ -11,10 +12,11 @@ namespace AudioStreamer
         private static byte[] networkKey;
         private static Dictionary<string, TcpClient> dictionary = new Dictionary<string, TcpClient>();
 
+        
+
         public static void Run()
         {
             Thread sThread = new(ServerThread);
-
             // TODO Добавить шифрование
             // networkKey = Encoding.ASCII.GetBytes("Chaplya4422");
             Console.WriteLine("[Web] WebServer started!");
@@ -49,12 +51,11 @@ namespace AudioStreamer
             {
                 try
                 {
-                    byte[] msg = new byte[1024];
-                    int size = cSocket.Receive(msg);
-                    List<string> userRequest = Encoding.Unicode.GetString(msg, 0, size).Split(" ").ToList();
+                    List<string> userRequest = Read(cSocket).Split(" ").ToList();
                     //Security.Decrypt(msg, );
 
                     // Работаем над нашим запросом
+                    Console.WriteLine(userRequest.First());
                     if (userRequest.Count == 0)
                     {
                         Console.WriteLine("[Web] Request error - no command present in request!");
@@ -126,29 +127,58 @@ namespace AudioStreamer
             handler.Send(rawData);
         }
 
+        private static string Read(Socket handler)
+        {
+            byte[] msg = new byte[1024];
+            int size = handler.Receive(msg);
+            return Encoding.Unicode.GetString(msg, 0, size);
+        }
+
         private static void SendSongToClient(Socket cSocket, string pathToFolder)
         {
-            Console.WriteLine($"[Web] Processing {Directory.GetFiles(pathToFolder).Length} files in folder");
-            foreach (string pathToFile in Directory.GetFiles(pathToFolder))
+            short transmissionCode = 0; // 0 - success; 1 - transmission error
+
+            List<string> songDirectory = Directory.GetFiles(pathToFolder).ToList();
+            Console.WriteLine($"[Web] Processing {songDirectory.Count} files in folder");
+
+            foreach (string pathToFile in songDirectory)
             {
+                int packetID = songDirectory.IndexOf(pathToFile);
+
                 using (FileStream fsSource = new FileStream(pathToFile, FileMode.Open, FileAccess.Read))
                 {
-                    byte[] bytes = new byte[fsSource.Length];
                     int numBytesToRead = (int)fsSource.Length;
                     int numBytesRead = 0;
+                    byte[] binContent = new byte[fsSource.Length];
+                    
 
                     while (numBytesToRead > 0)
                     {
-                        int n = fsSource.Read(bytes, numBytesRead, numBytesToRead);
+                        int n = fsSource.Read(binContent, numBytesRead, numBytesToRead);
                         numBytesRead += n;
                         numBytesToRead -= n;
                     }
-                    numBytesToRead = bytes.Length;
-                    SendRaw(cSocket, bytes);
+                    numBytesToRead = binContent.Length;
+                    SendRaw(cSocket, binContent);
+
+
+                        Console.WriteLine("[Web] Debug. File end.");
+
+
+                    // Ждём сообщение с чек-суммой
+                    /*string[] checksumMessage = Read(cSocket).Split();
+                    if (checksumMessage[0] == "chklength" && int.Parse(checksumMessage[1]) != numBytesRead)
+                    {
+                        Console.WriteLine($"[Web] Packet with ID {packetID} is invalid! Transmission stopped.");
+                        transmissionCode = 1;
+                        break;
+                    }
+                    */
                 }
+                
             }
-            SendRaw(cSocket, Array.Empty<byte>());
-            SendMessage(cSocket, "transmission_end");
+            Thread.Sleep(5000);
+            SendMessage(cSocket, $"transmission_end {transmissionCode}");
             GC.Collect();
         }
     }
