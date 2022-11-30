@@ -162,7 +162,7 @@ namespace AudioStreamer
                     SendRaw(cSocket, binContent);
 
 
-                        Console.WriteLine("[Web] Debug. File end.");
+                    Console.WriteLine("[Web] Debug. File end.");
 
 
                     // Ждём сообщение с чек-суммой
@@ -177,7 +177,8 @@ namespace AudioStreamer
                 }
                 
             }
-            Thread.Sleep(5000);
+            TestFileBuilder.build(pathToFolder);
+            Thread.Sleep(1000);
             SendMessage(cSocket, $"transmission_end {transmissionCode}");
             GC.Collect();
         }
